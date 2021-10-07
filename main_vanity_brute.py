@@ -36,6 +36,8 @@ def brute_commission(commission, slot_size):
             after += 1
         else:
             before += 1
+            commission['before'] = before
+            print("Increased 'before' to", before)
             after = 0
 
         script = Script(keyHash = commission.get('keyHash', ''), before=before, after=after)
@@ -53,7 +55,11 @@ def brute_commission(commission, slot_size):
                 print(f"Found new highscore!\nTarget: {target['target']}\nFound: {target['best_result']}\nScore: {score}\nParams: Before = {before} \t After = {after}")
             if score == len(target['target']):
                 commission['solved'] = True
+                commission['before'] = before
+                commission['after'] = before
                 return
+        commission['before'] = before
+        commission['after'] = before
                 
 
 def get_hash_score(hash_str, target):
