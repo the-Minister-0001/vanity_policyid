@@ -37,8 +37,9 @@ def brute_commission(commission, slot_size):
         else:
             before += 1
             commission['before'] = before
-            print("Increased 'before' to", before)
             after = 0
+            commission['after'] = after
+            print("Increased 'before' to", before)
 
         script = Script(keyHash = commission.get('keyHash', ''), before=before, after=after)
         cbor_sig = cbor2.dumps(script, default=default_encoder, value_sharing=False)
