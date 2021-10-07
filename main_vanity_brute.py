@@ -12,11 +12,13 @@ def main():
     print("maximum slot:", config.MAX_AFTER)
     commissions = load_commissions(config.CACHE_PATH)
 
-    for commission in commissions:
-        if commission['solved']:
-            continue
-        brute_commission(commission, config.BRUTE_SLOT_SIZE)
-        update_cache(commissions, config.CACHE_PATH)
+    while any(commission['solved'] != True for commission in commissions):
+        for commission in commissions:
+            if commission['solved']:
+                continue
+            print(f"Bruting {commission.get('description', '')}")
+            brute_commission(commission, config.BRUTE_SLOT_SIZE)
+            update_cache(commissions, config.CACHE_PATH)
 
 def default_encoder(encoder, commission):
     encoded_data = [1, [[0, bytes.fromhex(commission.keyHash)], [4, commission.after], [5, commission.before]]]
@@ -29,7 +31,7 @@ def brute_commission(commission, slot_size):
     start = time.time()
     for k in range(slot_size):
         if k % config.VERBOSITY == 0 and k > 0:
-            print(f"Finished {int(k/1000000)}M iterations in {time.time() - start:.2f}s ({(k/1000)/(time.time()-start):.2f}k/s)")
+            print(f"Finished {k/1000000:.2f}M iterations in {time.time() - start:.2f}s ({(k/1000)/(time.time()-start):.2f}k/s)")
         if after + k < config.MAX_AFTER:
             after += 1
         else:
@@ -46,11 +48,17 @@ def brute_commission(commission, slot_size):
                 target['before'] = before
                 target['after'] = after
                 target['score'] = score
+                commission['before'] = before
+                commission['after'] = after
                 print(f"Found new highscore!\nTarget: {target['target']}\nFound: {target['best_result']}\nScore: {score}\nParams: Before = {before} \t After = {after}")
+            if score == len(target['target']):
+                commission['solved'] = True
+                return
+                
 
 def get_hash_score(hash_str, target):
     score = 0
-    for idx in range(len(target)):
+    for idx in range(1+len(target)):
         if target[:idx] == hash_str[:idx]:
             score = idx
         else:
