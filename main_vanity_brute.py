@@ -57,10 +57,10 @@ def brute_commission(commission, slot_size):
             if score == len(target['target']):
                 commission['solved'] = True
                 commission['before'] = before
-                commission['after'] = before
+                commission['after'] = after
                 return
         commission['before'] = before
-        commission['after'] = before
+        commission['after'] = after
                 
 
 def get_hash_score(hash_str, target):
